@@ -17,7 +17,7 @@ This project builds a predictive system to forecast Azure Compute and Storage de
 
 ## 📂 Dataset
 
-A synthetic multivariate dataset was generated to simulate Azure cloud usage.
+A multivariate dataset was generated to simulate Azure cloud usage.
 It includes:
 
 **Core Features**
