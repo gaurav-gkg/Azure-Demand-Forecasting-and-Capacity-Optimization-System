@@ -123,14 +123,43 @@ def load_model_feature_importance(model_path: str = "artifacts/tuned_xgboost_mod
 
     try:
         with open(path, "rb") as f:
-            model = pickle.load(f)
+            artifact = pickle.load(f)
 
-        if not hasattr(model, "feature_importances_"):
+        model = artifact.get("model") if isinstance(artifact, dict) else artifact
+        feature_columns = artifact.get("feature_columns") if isinstance(artifact, dict) else None
+
+        if model is None:
             return None
 
-        importances = model.feature_importances_
-        if hasattr(model, "feature_names_in_"):
+        if hasattr(model, "feature_importances_"):
+            importances = list(model.feature_importances_)
+        elif hasattr(model, "get_booster"):
+            booster = model.get_booster()
+            score_map = booster.get_score(importance_type="gain")
+            if not score_map:
+                return None
+
+            if feature_columns:
+                ordered_names = list(feature_columns)
+            elif hasattr(booster, "feature_names") and booster.feature_names:
+                ordered_names = list(booster.feature_names)
+            else:
+                ordered_names = sorted(score_map.keys())
+
+            importance_lookup = {name: float(score_map.get(name, 0.0)) for name in ordered_names}
+            return pd.DataFrame({
+                "Feature": list(importance_lookup.keys()),
+                "Importance": list(importance_lookup.values()),
+            }).sort_values("Importance", ascending=False)
+        else:
+            return None
+
+        if feature_columns and len(feature_columns) == len(importances):
+            feature_names = list(feature_columns)
+        elif hasattr(model, "feature_names_in_"):
             feature_names = list(model.feature_names_in_)
+        elif hasattr(model, "get_booster") and getattr(model.get_booster(), "feature_names", None):
+            feature_names = list(model.get_booster().feature_names)
         else:
             feature_names = [f"feature_{i}" for i in range(len(importances))]
 
