@@ -1,82 +1,97 @@
 # Azure Demand Forecasting & Capacity Optimization System
 
-## 📌 Overview
+## Project Overview
 
-This project builds a predictive system to forecast Azure Compute and Storage demand using time-series analysis and machine learning. The goal is to help cloud infrastructure teams make smarter capacity provisioning decisions, reduce over-allocation costs, and improve service reliability.
+This project forecasts Azure resource demand (Compute and Storage) and supports capacity planning using time-series and machine learning methods.
 
----
-
-## 🎯 Objectives
-
-- Forecast future Azure resource demand across regions
-- Identify seasonal and regional usage patterns
-- Optimize capacity provisioning and reduce waste
-- Incorporate external factors affecting cloud demand
-
----
-
-## 📂 Dataset
-
-A multivariate dataset was generated to simulate Azure cloud usage.
 It includes:
 
-**Core Features**
+- demand forecasting models
+- batch prediction pipeline
+- interactive Streamlit dashboard for insights
 
-- Timestamp (daily)
-- Region
-- Service type (Compute / Storage)
-- Usage units
-- Provisioned capacity
-- Cost
-- Availability percentage
+## Live Dashboard
 
-**External Variables**
+https://azure-demand.streamlit.app/
 
-- Holiday indicator
-- Economic activity index
-- Market demand index
-- Seasonal temperature proxy
+## Objectives
 
-These variables allow both univariate and multivariate forecasting experiments.
+- Forecast Azure usage across regions and service types
+- Detect demand patterns and seasonality
+- Support capacity optimization and cost control
+- Turn model outputs into operational insights via dashboard
 
----
+## Dataset
 
-## ⚙️ Methodology
+The dataset is multivariate and includes:
 
-### 1️⃣ Data Preparation
+- timestamp
+- region
+- service_type
+- usage_units
+- provisioned_capacity
+- cost_usd
+- availability_pct
+- is_holiday
+- economic_index
+- market_demand_index
+- temperature_index
 
-- Timestamp formatting and sorting
-- Region standardization
-- Duplicate removal
-- Missing value handling using interpolation and forward fill
+## Methodology
 
-### 2️⃣ Feature Engineering
+1. Data Preparation:
 
-- Time features (month, weekday)
-- Utilization ratio
-- Lag features for demand history
-- Rolling averages for trend smoothing
+- Parse and sort timestamps
+- Standardize categories (region/service names)
+- Handle missing values and duplicates
 
-### 3️⃣ Modeling
+2. Feature Engineering:
 
-Models evaluated:
+- Time-based features (hour, day, weekday, month, year)
+- Lag features and rolling statistics
+- Spike indicators and encoded categorical features
 
-- ARIMA (baseline time-series model)
-- Tree-based models for multivariate forecasting
-- Performance measured using MAE and RMSE
+3. Modeling:
 
-### 4️⃣ Output & Insights
+- Baseline ARIMA
+- XGBoost regressor (tuned model used for deployment)
+- Evaluation with RMSE and MAE
 
-- Demand forecasts by region and service
-- Capacity buffer recommendations
-- Demand vs provision comparison
-- Visual trend and seasonality analysis
+4. Deployment and Usage:
 
----
+- Batch forecasts from CSV input
+- Visual analytics in Streamlit dashboard
+- Streamlit dashboard used as the Milestone 4 deliverable
 
-## 🧠 Key Learnings
+## Milestone Breakdown
 
-- Cloud demand behaves like other infrastructure loads with strong seasonal signals
-- External indicators improve forecasting accuracy
-- Data quality and preprocessing strongly impact model performance
+### Milestone 1: Data Collection and Cleaning
 
+- Loaded raw Azure demand data and validated core schema
+- Converted timestamp fields and ensured chronological ordering
+- Standardized categorical values (region and service naming)
+- Removed duplicates and handled missing values
+- Produced a clean, analysis-ready dataset
+
+### Milestone 2: Feature Engineering and Exploratory Insights
+
+- Created time-based features (hour, day, weekday, month, year)
+- Added lag features and rolling aggregates for trend capture
+- Created spike/risk indicators for unusual usage behavior
+- Encoded categorical variables for model compatibility
+- Checked data quality after transformation and validated feature readiness
+
+### Milestone 3: Model Development and Evaluation
+
+- Built baseline ARIMA model for time-series comparison
+- Trained XGBoost regression model with engineered features
+- Performed hyperparameter tuning for improved performance
+- Compared models using RMSE and MAE
+- Selected tuned XGBoost as primary production model and stored artifacts
+
+### Milestone 4: Forecast Integration and Operationalization
+
+- Built Streamlit dashboard for KPI tracking, regional trends, and risk alerts
+- Integrated forecast outputs into dashboard visuals for decision support
+- Added filters and KPI cards for region/service-level analysis
+- Published the dashboard for live access
